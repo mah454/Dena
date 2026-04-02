@@ -31,9 +31,9 @@ public class DenaCommandRegistry implements CommandRegistry {
 
         // Command Description
         commandInfo.put("list", List.of("List all available modules"));
-        commandInfo.put("load", List.of("Load a module from directory", "Usage: load <module-name>"));
-        commandInfo.put("stop", List.of("Stop a running module", "Usage: stop <module-name>"));
-        commandInfo.put("start", List.of("Start a loaded module", "Usage: start <module-name>"));
+        commandInfo.put("load", List.of("Load a module from directory", "Usage: load <index>"));
+        commandInfo.put("stop", List.of("Stop a running module", "Usage: stop <index>"));
+        commandInfo.put("start", List.of("Start a loaded module", "Usage: start <index>"));
     }
 
     @Override
