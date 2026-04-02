@@ -184,7 +184,7 @@ public class ModuleController {
             logger.info("[{}] - Trigger System Garbage Collector", moduleName);
             System.gc();
 
-            logger.info("[{}] - CleaUp module repository", moduleName);
+            logger.info("[{}] - CleaUp module", moduleName);
             context.setRunning(false);
         } catch (Exception e) {
             throw new RuntimeException(e);
