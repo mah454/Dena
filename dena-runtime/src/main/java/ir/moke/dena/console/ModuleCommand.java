@@ -1,0 +1,81 @@
+package ir.moke.dena.console;
+
+import ir.moke.dena.module.ModuleContext;
+import ir.moke.dena.module.ModuleController;
+import ir.moke.dena.module.ModuleRepository;
+import org.jline.console.CommandInput;
+import org.jline.terminal.Terminal;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+public class ModuleCommand implements TtyAsciiCodecs {
+    public static void moduleList(CommandInput input) {
+        String line = "%s%s%-7s %-20s %-18s %-8s %-16s %s".formatted(GREEN, BOLD, "index", "name", "version", "running", "path", RESET);
+        println(input, line);
+        List<ModuleContext> modules = ModuleRepository.list();
+        for (int i = 0; i < modules.size(); i++) {
+            ModuleContext context = modules.get(i);
+            String index = String.valueOf(i + 1);
+            String name = context.getName();
+            String version = context.getVersion();
+            boolean running = context.isRunning();
+            String path = context.getPath().toString();
+            line = "%-7s %-20s %-18s %s%-8s%s %-16s".formatted(index, name, version, running ? RESET : BACKGROUND_RED, running, RESET, path);
+            println(input, line);
+        }
+    }
+
+    public static void moduleLoad(CommandInput input) {
+        try {
+            int index = Integer.parseInt(input.args()[0]);
+            if (index < 0) {
+                println(input, "[WARN] invalid index");
+                return;
+            }
+            ModuleContext context = ModuleRepository.list().get(index - 1);
+            ModuleController.start(context.getName());
+        } catch (Exception e) {
+            println(input, "[ERROR] %s".formatted(e.getMessage()));
+        }
+    }
+
+    public static void moduleStop(CommandInput input) {
+        try {
+            int index = Integer.parseInt(input.args()[0]);
+            if (index < 0) {
+                println(input, "[WARN] invalid index");
+                return;
+            }
+            ModuleContext context = ModuleRepository.list().get(index - 1);
+            ModuleController.stop(context.getName());
+        } catch (Exception e) {
+            println(input, "[ERROR] %s".formatted(e.getMessage()));
+        }
+    }
+
+    public static void moduleStart(CommandInput input) {
+        try {
+            int index = Integer.parseInt(input.args()[0]);
+            if (index < 0) {
+                println(input, "[WARN] invalid index");
+                return;
+            }
+            ModuleContext context = ModuleRepository.list().get(index - 1);
+            ModuleController.start(context.getName());
+        } catch (Exception e) {
+            println(input, "[ERROR] %s".formatted(e.getMessage()));
+        }
+
+    }
+
+    private static void println(CommandInput input, String message) {
+        try (Terminal terminal = input.terminal()) {
+            PrintWriter writer = terminal.writer();
+            writer.println(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
