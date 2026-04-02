@@ -178,10 +178,10 @@ public class ModuleController {
             logger.info("[{}] - Shutdown module executor service", moduleName);
             es.shutdown();
 
-            logger.info("[{}] - Close ClassLoader", moduleName);
+            logger.info("[{}] - Close classLoader", moduleName);
             classLoader.close();
 
-            logger.info("[{}] - Trigger System Garbage Collector", moduleName);
+            logger.info("[{}] - Trigger GC", moduleName);
             System.gc();
 
             logger.info("[{}] - CleaUp module", moduleName);
