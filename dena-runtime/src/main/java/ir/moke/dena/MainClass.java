@@ -12,8 +12,9 @@ public class MainClass {
     private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
 
     static {
-        logger.info("Dena work directory: {}", workDir);
+        System.out.println(">>> " + System.getenv("DENA.WORK-DIR"));
         System.setProperty("dena.work-dir", workDir);
+        logger.info("Dena work directory: {}", workDir);
     }
 
     static void main() {
