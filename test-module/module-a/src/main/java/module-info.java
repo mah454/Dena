@@ -5,6 +5,5 @@ module module.a {
     requires dena.api;
     requires moke.utils;
     exports ir.moke.module.a;
-    opens ir.moke.module.a;
     provides IModule with ModuleRunner;
 }

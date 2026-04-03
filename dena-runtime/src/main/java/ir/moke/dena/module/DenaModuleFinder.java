@@ -9,6 +9,7 @@ import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
     private final Set<String> excludedModules;
@@ -37,15 +38,24 @@ public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
 
         // Build shared layer first
         ModuleLayer sharedLayer = createSharedLayer();
-        this.parentLayers = new ArrayList<>();
-        this.parentLayers.add(sharedLayer);
 
-        Set<String> exclusions = new HashSet<>();
-        sharedLayer.modules().forEach(m -> exclusions.add(m.getName()));
+        // Track modules already available in parent layers to avoid duplicates
+        Set<String> availableInParents = new HashSet<>();
+        sharedLayer.modules().forEach(m -> availableInParents.add(m.getName()));
+
+        List<ModuleLayer> layers = new ArrayList<>();
+//        layers.add(ModuleLayer.boot());
+        layers.add(sharedLayer);
+
+        Set<String> exclusions = new HashSet<>(availableInParents);
 
         // Discover dependencies and build parent layers
         Set<ModuleReference> allModules = delegateFinder.findAll();
-        this.allModulesCache = Set.copyOf(allModules); // Immutable cache
+
+        // Filter out excluded modules from the cache
+        this.allModulesCache = allModules.stream()
+                .filter(ref -> !exclusions.contains(ref.descriptor().name()))
+                .collect(Collectors.toUnmodifiableSet());
 
         for (ModuleReference ref : allModules) {
             ModuleDescriptor descriptor = ref.descriptor();
@@ -55,15 +65,27 @@ public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
 
                 if (depContext != null) {
                     ModuleLayer depLayer = depContext.getLayer();
-                    if (!parentLayers.contains(depLayer)) {
-                        parentLayers.add(depLayer);
-                        depLayer.modules().forEach(m -> exclusions.add(m.getName()));
+
+                    // CRITICAL FIX: Only add dependency layer if it provides
+                    // modules not already available in previous layers
+                    Set<String> depModuleNames = depLayer.modules().stream()
+                            .map(Module::getName)
+                            .collect(Collectors.toSet());
+
+                    boolean providesNewModules = depModuleNames.stream()
+                            .anyMatch(name -> !availableInParents.contains(name));
+
+                    if (providesNewModules && !layers.contains(depLayer)) {
+                        layers.add(depLayer);
+                        availableInParents.addAll(depModuleNames);
+                        exclusions.addAll(depModuleNames);
                     }
                 }
             }
         }
 
-        this.excludedModules = Set.copyOf(exclusions); // Immutable
+        this.parentLayers = List.copyOf(layers);
+        this.excludedModules = Set.copyOf(exclusions);
 
         // Build configurations from parent layers
         this.parentConfigurations = parentLayers.stream()
@@ -106,7 +128,6 @@ public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
                 .toList();
 
         if (moduleNames.isEmpty()) {
-            // Return boot layer if no shared modules exist
             return ModuleLayer.boot();
         }
 
@@ -121,7 +142,7 @@ public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
         return ModuleLayer.defineModulesWithOneLoader(
                 configuration,
                 List.of(bootLayer),
-                DenaModuleFinder.class.getClassLoader()
+                ClassLoader.getSystemClassLoader()
         ).layer();
     }
 }

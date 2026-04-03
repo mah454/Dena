@@ -6,10 +6,10 @@ module dena.runtime {
     requires dena.api;
     requires com.fasterxml.jackson.annotation;
     requires org.slf4j;
-    requires moke.utils;
     requires org.jline.reader;
     requires org.jline.builtins;
     requires org.jline.terminal;
     requires org.jline.console;
     requires ch.qos.logback.core;
+    requires moke.utils;
 }
