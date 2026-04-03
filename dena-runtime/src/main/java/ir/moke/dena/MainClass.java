@@ -1,6 +1,6 @@
 package ir.moke.dena;
 
-import ir.moke.dena.console.DenaCommandLine;
+import ir.moke.dena.console.CommandLine;
 import ir.moke.dena.module.ModuleController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,6 @@ public class MainClass {
         ModuleController.load("module.a");
         ModuleController.load("ir.sample");
 
-        DenaCommandLine.run();
+        CommandLine.run();
     }
 }

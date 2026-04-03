@@ -6,7 +6,7 @@ import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-public class DenaCommandLine {
+public class CommandLine {
 
     public static void run() {
         try {
@@ -15,10 +15,10 @@ public class DenaCommandLine {
             //
             // Command registers
             //
-            DenaCommandRegistry denaCommandRegistry = new DenaCommandRegistry();
+            CommandRegistry commandRegistry = new CommandRegistry();
             SystemRegistryImpl system = new SystemRegistryImpl(parser, terminal, null, null);
 
-            system.setCommandRegistries(denaCommandRegistry);
+            system.setCommandRegistries(commandRegistry);
             //
             // Terminal & LineReader
             //
@@ -32,7 +32,7 @@ public class DenaCommandLine {
                     .option(LineReader.Option.EMPTY_WORD_OPTIONS, false)
                     .build();
 
-            denaCommandRegistry.setLineReader(reader);
+            commandRegistry.setLineReader(reader);
             //
             // REPL-loop
             //

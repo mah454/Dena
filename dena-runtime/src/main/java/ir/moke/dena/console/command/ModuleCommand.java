@@ -1,5 +1,6 @@
-package ir.moke.dena.console;
+package ir.moke.dena.console.command;
 
+import ir.moke.dena.console.TtyAsciiCodecs;
 import ir.moke.dena.module.ModuleContext;
 import ir.moke.dena.module.ModuleController;
 import ir.moke.dena.module.ModuleRepository;
@@ -10,6 +11,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static ir.moke.dena.console.ConsoleUtils.println;
 
 public class ModuleCommand implements TtyAsciiCodecs {
     public static void moduleList(CommandInput input) {
@@ -56,15 +59,6 @@ public class ModuleCommand implements TtyAsciiCodecs {
             } else {
                 println(input, "[ERROR] %s".formatted(e.getMessage()));
             }
-        }
-    }
-
-    private static void println(CommandInput input, String message) {
-        try (Terminal terminal = input.terminal()) {
-            PrintWriter writer = terminal.writer();
-            writer.println(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

@@ -5,10 +5,11 @@ import ir.moke.dena.api.IModule;
 import java.util.Timer;
 
 public class ModuleRunner implements IModule {
-    private final Timer timer = new Timer("Sample Timer Module");
+    private Timer timer;
 
     @Override
     public void start() {
+        timer = new Timer("Sample Timer Module");
         timer.schedule(new TaskExecutor(), 0, 2000);
     }
 

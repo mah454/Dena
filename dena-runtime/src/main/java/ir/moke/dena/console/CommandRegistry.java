@@ -1,9 +1,10 @@
 package ir.moke.dena.console;
 
+import ir.moke.dena.console.command.ModuleCommand;
+import ir.moke.dena.console.command.SystemCommand;
 import org.jline.console.CmdDesc;
 import org.jline.console.CommandInput;
 import org.jline.console.CommandMethods;
-import org.jline.console.CommandRegistry;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.impl.completer.NullCompleter;
@@ -16,23 +17,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DenaCommandRegistry implements CommandRegistry {
+public class CommandRegistry implements org.jline.console.CommandRegistry {
     private LineReader reader;
     private final Map<String, CommandMethods> commandExecute = new HashMap<>();
     private final Map<String, List<String>> commandInfo = new HashMap<>();
     private final Map<String, String> aliasCommand = new HashMap<>();
 
-    public DenaCommandRegistry() {
+    public CommandRegistry() {
+        // Module Commands
         commandExecute.put("list", new CommandMethods(ModuleCommand::moduleList, this::defaultCompleter));
         commandExecute.put("load", new CommandMethods(ModuleCommand::moduleLoad, this::defaultCompleter));
         commandExecute.put("stop", new CommandMethods(ModuleCommand::moduleStop, this::defaultCompleter));
         commandExecute.put("start", new CommandMethods(ModuleCommand::moduleStart, this::defaultCompleter));
+
+        // System Commands
+        commandExecute.put("shutdown", new CommandMethods(SystemCommand::exit, this::defaultCompleter));
+        commandExecute.put("gc", new CommandMethods(SystemCommand::gc, this::defaultCompleter));
 
         // Command Description
         commandInfo.put("list", List.of("List all available modules"));
         commandInfo.put("load", List.of("Load a module from directory", "Usage: load <index>"));
         commandInfo.put("stop", List.of("Stop a running module", "Usage: stop <index>"));
         commandInfo.put("start", List.of("Start a loaded module", "Usage: start <index>"));
+        commandInfo.put("shutdown", List.of("Shutdown system"));
+        commandInfo.put("gc", List.of("Call jvm gc"));
     }
 
     @Override
