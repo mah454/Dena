@@ -102,8 +102,9 @@ public class DenaCommandRegistry implements CommandRegistry {
         }
 
         // Convert description strings to AttributedString
-        List<AttributedString> mainDesc =
-                info.stream().map(AttributedString::new).toList();
+        List<AttributedString> mainDesc = info.stream()
+                .map(AttributedString::new)
+                .toList();
 
         // Return only description; NO generic arg spec
         return new CmdDesc(mainDesc, List.of(), Map.of());
