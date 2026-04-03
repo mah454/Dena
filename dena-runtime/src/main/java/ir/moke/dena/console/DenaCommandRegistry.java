@@ -21,7 +21,6 @@ public class DenaCommandRegistry implements CommandRegistry {
     private final Map<String, CommandMethods> commandExecute = new HashMap<>();
     private final Map<String, List<String>> commandInfo = new HashMap<>();
     private final Map<String, String> aliasCommand = new HashMap<>();
-    private Exception exception;
 
     public DenaCommandRegistry() {
         commandExecute.put("list", new CommandMethods(ModuleCommand::moduleList, this::defaultCompleter));
@@ -81,13 +80,8 @@ public class DenaCommandRegistry implements CommandRegistry {
         return out;
     }
 
-    public Object invoke(CommandSession session, String command, Object... args) throws Exception {
-        exception = null;
-        Object out = commandExecute.get(command(command)).execute().apply(new CommandInput(command, args, session));
-        if (exception != null) {
-            throw exception;
-        }
-        return out;
+    public Object invoke(CommandSession session, String command, Object... args) {
+        return commandExecute.get(command(command)).execute().apply(new CommandInput(command, args, session));
     }
 
     @Override

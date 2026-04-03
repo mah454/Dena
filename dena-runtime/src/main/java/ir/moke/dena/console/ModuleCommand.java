@@ -9,6 +9,7 @@ import org.jline.terminal.Terminal;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ModuleCommand implements TtyAsciiCodecs {
     public static void moduleList(CommandInput input) {
@@ -28,34 +29,19 @@ public class ModuleCommand implements TtyAsciiCodecs {
     }
 
     public static void moduleLoad(CommandInput input) {
-        try {
-            int index = Integer.parseInt(input.args()[0]);
-            if (index < 0) {
-                println(input, "[WARN] invalid index");
-                return;
-            }
-            ModuleContext context = ModuleRepository.list().get(index - 1);
-            ModuleController.start(context.getName());
-        } catch (Exception e) {
-            println(input, "[ERROR] %s".formatted(e.getMessage()));
-        }
+        processRequest(input, ModuleController::load);
     }
 
     public static void moduleStop(CommandInput input) {
-        try {
-            int index = Integer.parseInt(input.args()[0]);
-            if (index < 0) {
-                println(input, "[WARN] invalid index");
-                return;
-            }
-            ModuleContext context = ModuleRepository.list().get(index - 1);
-            ModuleController.stop(context.getName());
-        } catch (Exception e) {
-            println(input, "[ERROR] %s".formatted(e.getMessage()));
-        }
+        processRequest(input, ModuleController::stop);
     }
 
     public static void moduleStart(CommandInput input) {
+        processRequest(input, ModuleController::start);
+    }
+
+    /*---- other methods ----*/
+    private static void processRequest(CommandInput input, Consumer<String> controller) {
         try {
             int index = Integer.parseInt(input.args()[0]);
             if (index < 0) {
@@ -63,11 +49,14 @@ public class ModuleCommand implements TtyAsciiCodecs {
                 return;
             }
             ModuleContext context = ModuleRepository.list().get(index - 1);
-            ModuleController.start(context.getName());
+            controller.accept(context.getName());
         } catch (Exception e) {
-            println(input, "[ERROR] %s".formatted(e.getMessage()));
+            if (e instanceof IndexOutOfBoundsException) {
+                println(input, "[ERROR] Invalid index");
+            } else {
+                println(input, "[ERROR] %s".formatted(e.getMessage()));
+            }
         }
-
     }
 
     private static void println(CommandInput input, String message) {
