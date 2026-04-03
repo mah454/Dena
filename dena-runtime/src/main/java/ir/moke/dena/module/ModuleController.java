@@ -47,6 +47,9 @@ public class ModuleController {
         try {
             if (ModuleRepository.isExists(moduleName)) return;
             Path modulePath = denaWorkingDirectory.resolve(moduleName);
+            if (!FileUtils.isFileExists(modulePath)) {
+                throw new IllegalStateException("Module %s directory not exists".formatted(moduleName));
+            }
             URLClassLoader classLoader = new URLClassLoader(new URL[]{modulePath.toUri().toURL()});
             ModuleLayer moduleLayer = createLayer(modulePath, classLoader);
 
@@ -76,7 +79,7 @@ public class ModuleController {
             ModuleRepository.add(context);
             logger.info("[{}] - Module loaded", moduleName);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.warn(e.getMessage());
         }
     }
 

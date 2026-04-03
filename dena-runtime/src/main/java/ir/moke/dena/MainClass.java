@@ -8,16 +8,21 @@ import org.jline.reader.*;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class MainClass {
-    private static final String workDir = "/home/mah454/dena";
+    private static final String workDir = Optional.ofNullable(System.getenv("DENA.WORK-DIR")).orElse(System.getProperty("user.dir"));
     private static final Path workDirPath = Paths.get(workDir);
+    private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
 
     static {
+        logger.info("Dena work directory: {}", workDir);
         System.setProperty("dena.work-dir", workDir);
     }
 
