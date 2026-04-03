@@ -1,5 +1,6 @@
 package ir.moke.dena.module;
 
+import ir.moke.dena.GlobalVariables;
 import ir.moke.dena.api.IModule;
 import ir.moke.dena.api.ModuleMetadata;
 import ir.moke.utils.FileUtils;
@@ -19,18 +20,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public class ModuleController {
+public class ModuleController implements GlobalVariables {
     private static final Logger logger = LoggerFactory.getLogger(ModuleController.class);
-    private static final Path denaWorkingDirectory = Path.of(System.getProperty("dena.work-dir"));
     private static final ExecutorService controllerExecutorService = Executors.newSingleThreadExecutor();
 
     static {
+        FileUtils.createDirectory(denaModulesDirectory);
         listenWorkDir();
     }
 
     private static void listenWorkDir() {
         List<WatchEvent.Kind<?>> kindList = List.of(StandardWatchEventKinds.ENTRY_DELETE);
-        controllerExecutorService.submit(() -> FileSystemUtils.watchPath(denaWorkingDirectory, kindList, ModuleController::onDeleteModule));
+        controllerExecutorService.submit(() -> FileSystemUtils.watchPath(denaModulesDirectory, kindList, ModuleController::onDeleteModule));
     }
 
     @SuppressWarnings("unchecked")
@@ -46,7 +47,7 @@ public class ModuleController {
     public static void load(String moduleName) {
         try {
             if (ModuleRepository.isExists(moduleName)) return;
-            Path modulePath = denaWorkingDirectory.resolve(moduleName);
+            Path modulePath = denaModulesDirectory.resolve(moduleName);
             if (!FileUtils.isFileExists(modulePath)) {
                 throw new IllegalStateException("Module %s directory not exists".formatted(moduleName));
             }
