@@ -206,7 +206,7 @@ public class ModuleController implements GlobalVariables {
             logger.info("[{}] - Shutdown module executor service", moduleName);
             es.shutdown();
 
-            logger.info("[{}] - CleaUp module", moduleName);
+            logger.info("[{}] - CleaUp references", moduleName);
             context.setRunning(false);
         } catch (Exception e) {
             throw new RuntimeException(e);
