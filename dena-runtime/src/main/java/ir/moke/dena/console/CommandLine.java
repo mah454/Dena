@@ -8,6 +8,7 @@ import org.jline.terminal.TerminalBuilder;
 
 public class CommandLine implements TtyAsciiCodecs {
     private static final String PS1 = "%s DENA %s%s\uE0B0 %s".formatted(BACKGROUND_BLUE, RESET, BLUE, RESET);
+
     public static void run() {
         try {
             Terminal terminal = TerminalBuilder.builder().build();
@@ -22,7 +23,6 @@ public class CommandLine implements TtyAsciiCodecs {
             //
             // Terminal & LineReader
             //
-            System.out.println(terminal.getName() + ": " + terminal.getType());
             LineReader reader = LineReaderBuilder.builder()
                     .terminal(terminal)
                     .completer(system.completer())

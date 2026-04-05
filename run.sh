@@ -14,6 +14,7 @@ cp -aRvf ./test-module/module-b/target/module-b-0.1.jar ./modules/ir.sample/
 mv -vf ./dena-api/target/dena-api-0.1.jar ./shared/
 mv -vf ./dena-runtime/target/lib/*slf4j* ./shared/
 
+clear
 java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
   -p shared \
   --add-modules ALL-MODULE-PATH \

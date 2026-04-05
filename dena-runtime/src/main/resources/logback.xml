@@ -23,14 +23,6 @@
         </encoder>
     </appender>
 
-    <logger name="org.hibernate" level="ERROR" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-
-    <logger name="ir.eshragh.crm" level="ERROR" additivity="false">
-        <appender-ref ref="FILE-ROLLING"/>
-    </logger>
-
     <root level="TRACE">
         <appender-ref ref="FILE-ROLLING"/>
     </root>
