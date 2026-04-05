@@ -11,7 +11,8 @@ cp -aRvf ./test-module/module-a/target/module-a-0.1.jar ./modules/module.a/
 cp -aRvf ./test-module/module-b/target/module-b-0.1.jar ./modules/ir.sample/
 
 # Copy dena-api to shared
-cp -aRvf ./dena-api/target/dena-api-0.1.jar ./shared/
+mv -vf ./dena-api/target/dena-api-0.1.jar ./shared/
+mv -vf ./dena-runtime/target/lib/*slf4j* ./shared/
 
 java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
   -p shared \

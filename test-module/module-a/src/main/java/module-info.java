@@ -8,7 +8,8 @@ module module.a {
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.datatype.jsr310;  // Needed for Java 8 date/time support
 
-    requires java.sql;  // Often needed by Jackson for date types
+    requires java.sql;
+    requires org.slf4j;  // Often needed by Jackson for date types
 
     exports ir.moke.module.a;
     provides ir.moke.dena.api.IModule with ir.moke.module.a.ModuleRunner;

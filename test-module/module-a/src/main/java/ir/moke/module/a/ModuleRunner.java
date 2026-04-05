@@ -2,19 +2,23 @@ package ir.moke.module.a;
 
 import ir.moke.dena.api.IModule;
 import ir.moke.utils.json.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
 public class ModuleRunner implements IModule {
+    private static final Logger logger = LoggerFactory.getLogger(ModuleRunner.class);
+
     @Override
     public void start() {
         Person p = new Person("test", LocalDateTime.now());
-        System.out.println(JsonUtils.toJson(p));
-        System.out.println("Module Started");
+        logger.info(JsonUtils.toJson(p));
+        logger.info("Module Started");
     }
 
     @Override
     public void stop() {
-        System.out.println("Module Stopped");
+        logger.info("Module Stopped");
     }
 }
