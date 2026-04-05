@@ -49,3 +49,4 @@ docker/lib
 *.img
 **/modules/
 **/shared/
+**/logs/
