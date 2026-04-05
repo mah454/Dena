@@ -82,7 +82,7 @@ public class ModuleController implements GlobalVariables {
             String url = metadata != null ? metadata.url() : null;
             Optional<ModuleDescriptor.Version> optionalVersion = module.getDescriptor().version();
 
-            ModuleContext context = new ModuleContext(moduleLayer, moduleJarPath, moduleName, description, maintainer, url);
+            ModuleContext context = new ModuleContext(moduleLayer, modulePath, moduleName, description, maintainer, url);
             IModule iModule = detectIModule(context);
             context.setIModule(iModule);
             context.setClassLoader(classLoader);
@@ -97,7 +97,7 @@ public class ModuleController implements GlobalVariables {
     public static void unload(String moduleName) {
         try {
             ModuleContext context = ModuleRepository.get(moduleName);
-            unloadDependencyModule(context);
+            unloadDependentModule(context);
             stop(moduleName);
             deactivateModule(context);
             ModuleRepository.remove(moduleName);
@@ -269,14 +269,11 @@ public class ModuleController implements GlobalVariables {
         }
     }
 
-    private static void unloadDependencyModule(ModuleContext context) {
-        for (ModuleLayer parent : context.getLayer().parents()) {
-            for (Module module : parent.modules()) {
-                if (ModuleRepository.isExists(module.getName())) {
-                    unload(module.getName());
-                }
-            }
-        }
+    private static void unloadDependentModule(ModuleContext context) {
+        ModuleRepository.findDependentModules(context)
+                .stream()
+                .map(ModuleContext::getName)
+                .forEach(ModuleController::unload);
     }
 
     private static boolean isModuleExists(String moduleName) {

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ModuleRepository {
     private static final Logger logger = LoggerFactory.getLogger(ModuleRepository.class);
@@ -38,5 +39,17 @@ public class ModuleRepository {
 
     public static void remove(ModuleContext context) {
         MODULES.remove(context);
+    }
+
+    public static List<ModuleContext> findDependentModules(ModuleContext context) {
+        return MODULES.stream()
+                .filter(ctx -> ctx.getLayer().modules().stream()
+                        .filter(m -> m.getName().equals(ctx.getName()))
+                        .findFirst()
+                        .map(Module::getDescriptor)
+                        .map(desc -> desc.requires().stream()
+                                .anyMatch(req -> req.name().equals(context.getName())))
+                        .orElse(false))
+                .collect(Collectors.toList());
     }
 }
