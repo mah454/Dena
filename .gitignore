@@ -50,3 +50,4 @@ docker/lib
 **/modules/
 **/shared/
 **/logs/
+**/framework/
