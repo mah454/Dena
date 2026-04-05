@@ -1,30 +1,24 @@
 package ir.moke.dena.module;
 
-import ir.moke.dena.GlobalVariables;
-import ir.moke.utils.FileUtils;
+import ir.moke.dena.utils.FileUtils;
 
 import java.lang.module.Configuration;
 import java.lang.module.ModuleDescriptor;
 import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
+public class DenaModuleFinder implements ModuleFinder {
     private final Set<String> excludedModules;
     private final ModuleFinder delegateFinder;
     private final List<Configuration> parentConfigurations;
     private final List<ModuleLayer> parentLayers;
     private final Set<ModuleReference> allModulesCache;
-
-    static {
-        try {
-            FileUtils.createDirectory(denaSharedDirectory);
-        } catch (Exception e) {
-            throw new ExceptionInInitializerError("Failed to create shared directory: " + e.getMessage());
-        }
-    }
 
     public DenaModuleFinder(Path path) {
         if (path == null) {
@@ -35,69 +29,56 @@ public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
         }
 
         this.delegateFinder = ModuleFinder.of(path);
+        Set<ModuleReference> foundModules = this.delegateFinder.findAll();
 
-        // Build shared layer first
-        ModuleLayer sharedLayer = createSharedLayer();
+        // Parse module-info of modules in this path to find their requirements
+        Set<String> requiredModuleNames = foundModules.stream()
+                .flatMap(ref -> ref.descriptor().requires().stream())
+                .map(ModuleDescriptor.Requires::name)
+                .filter(name -> !name.startsWith("java.") && !name.startsWith("jdk."))
+                .collect(Collectors.toSet());
 
-        // Track modules already available in parent layers to avoid duplicates
-        Set<String> availableInParents = new HashSet<>();
-        sharedLayer.modules().forEach(m -> availableInParents.add(m.getName()));
+        // Start with Boot Layer
+        ModuleLayer bootLayer = ModuleLayer.boot();
+        Set<ModuleLayer> parentLayerSet = new LinkedHashSet<>();
+        parentLayerSet.add(bootLayer);
 
-        List<ModuleLayer> layers = new ArrayList<>();
-//        layers.add(ModuleLayer.boot());
-        layers.add(sharedLayer);
-
-        Set<String> exclusions = new HashSet<>(availableInParents);
-
-        // Discover dependencies and build parent layers
-        Set<ModuleReference> allModules = delegateFinder.findAll();
-
-        // Filter out excluded modules from the cache
-        this.allModulesCache = allModules.stream()
-                .filter(ref -> !exclusions.contains(ref.descriptor().name()))
-                .collect(Collectors.toUnmodifiableSet());
-
-        for (ModuleReference ref : allModules) {
-            ModuleDescriptor descriptor = ref.descriptor();
-            for (ModuleDescriptor.Requires require : descriptor.requires()) {
-                String depName = require.name();
-                ModuleContext depContext = ModuleRepository.get(depName);
-
-                if (depContext != null) {
-                    ModuleLayer depLayer = depContext.getLayer();
-
-                    // CRITICAL FIX: Only add dependency layer if it provides
-                    // modules not already available in previous layers
-                    Set<String> depModuleNames = depLayer.modules().stream()
-                            .map(Module::getName)
-                            .collect(Collectors.toSet());
-
-                    boolean providesNewModules = depModuleNames.stream()
-                            .anyMatch(name -> !availableInParents.contains(name));
-
-                    if (providesNewModules && !layers.contains(depLayer)) {
-                        layers.add(depLayer);
-                        availableInParents.addAll(depModuleNames);
-                        exclusions.addAll(depModuleNames);
-                    }
+        // Look up required modules in ModuleRepository and add their layers as parents
+        for (String requiredName : requiredModuleNames) {
+            if (ModuleRepository.isExists(requiredName)) {
+                ModuleContext context = ModuleRepository.get(requiredName);
+                if (context != null && context.getLayer() != null) {
+                    ModuleLayer dependencyLayer = context.getLayer();
+                    // Add all parent layers of the dependency to avoid resolution gaps
+                    // This ensures transitive visibility
+                    parentLayerSet.addAll(dependencyLayer.parents());
+                    parentLayerSet.add(dependencyLayer);
                 }
             }
         }
 
-        this.parentLayers = List.copyOf(layers);
-        this.excludedModules = Set.copyOf(exclusions);
-
-        // Build configurations from parent layers
+        this.parentLayers = List.copyOf(parentLayerSet);
         this.parentConfigurations = parentLayers.stream()
                 .map(ModuleLayer::configuration)
-                .distinct()
-                .toList();
+                .collect(Collectors.toList());
+
+        // Exclude modules already loaded in parent layers (including boot + dependencies)
+        Set<String> exclusions = parentLayers.stream()
+                .flatMap(layer -> layer.modules().stream())
+                .map(Module::getName)
+                .collect(Collectors.toSet());
+
+        this.allModulesCache = foundModules.stream()
+                .filter(ref -> !exclusions.contains(ref.descriptor().name()))
+                .collect(Collectors.toUnmodifiableSet());
+
+        this.excludedModules = Set.copyOf(exclusions);
     }
 
     @Override
     public Optional<ModuleReference> find(String name) {
         if (excludedModules.contains(name)) {
-            return Optional.empty();
+            return Optional.empty(); // Resolve from parent layer
         }
         return delegateFinder.find(name);
     }
@@ -117,32 +98,5 @@ public class DenaModuleFinder implements ModuleFinder, GlobalVariables {
 
     public List<Configuration> getParentConfigurations() {
         return parentConfigurations;
-    }
-
-    private ModuleLayer createSharedLayer() {
-        ModuleFinder finder = ModuleFinder.of(denaSharedDirectory);
-
-        List<String> moduleNames = finder.findAll().stream()
-                .map(ModuleReference::descriptor)
-                .map(ModuleDescriptor::name)
-                .toList();
-
-        if (moduleNames.isEmpty()) {
-            return ModuleLayer.boot();
-        }
-
-        ModuleLayer bootLayer = ModuleLayer.boot();
-        Configuration configuration = Configuration.resolveAndBind(
-                finder,
-                List.of(bootLayer.configuration()),
-                ModuleFinder.of(),
-                moduleNames
-        );
-
-        return ModuleLayer.defineModulesWithOneLoader(
-                configuration,
-                List.of(bootLayer),
-                ClassLoader.getSystemClassLoader()
-        ).layer();
     }
 }

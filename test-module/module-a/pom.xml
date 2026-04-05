@@ -18,6 +18,7 @@
             <groupId>ir.moke</groupId>
             <artifactId>dena-api</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ir.moke</groupId>

@@ -8,14 +8,9 @@ import java.time.LocalDateTime;
 public class ModuleRunner implements IModule {
     @Override
     public void start() {
-        try {
-            System.out.println("Before");
-            Person p = new Person("test", LocalDateTime.now());
-            System.out.println(JsonUtils.toJson(p));
-            System.out.println("Module Started");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        Person p = new Person("test", LocalDateTime.now());
+        System.out.println(JsonUtils.toJson(p));
+        System.out.println("Module Started");
     }
 
     @Override

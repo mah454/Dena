@@ -1,6 +1,5 @@
 package ir.moke.dena.module;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ir.moke.dena.api.IModule;
 
 import java.net.URLClassLoader;
@@ -49,7 +48,6 @@ public class ModuleContext {
         this.version = version;
     }
 
-    @JsonIgnore
     public ModuleLayer getLayer() {
         return layer;
     }
@@ -66,7 +64,6 @@ public class ModuleContext {
         this.running = running;
     }
 
-    @JsonIgnore
     public ExecutorService getExecutorService() {
         return executorService;
     }
@@ -75,7 +72,6 @@ public class ModuleContext {
         this.executorService = executorService;
     }
 
-    @JsonIgnore
     public IModule getIModule() {
         return iModule;
     }

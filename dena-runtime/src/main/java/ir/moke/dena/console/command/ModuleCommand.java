@@ -5,10 +5,7 @@ import ir.moke.dena.module.ModuleContext;
 import ir.moke.dena.module.ModuleController;
 import ir.moke.dena.module.ModuleRepository;
 import org.jline.console.CommandInput;
-import org.jline.terminal.Terminal;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -21,18 +18,21 @@ public class ModuleCommand implements TtyAsciiCodecs {
         List<ModuleContext> modules = ModuleRepository.list();
         for (int i = 0; i < modules.size(); i++) {
             ModuleContext context = modules.get(i);
+            boolean hasService = context.getIModule() != null;
             String index = String.valueOf(i + 1);
             String name = context.getName();
             String version = context.getVersion();
             boolean running = context.isRunning();
             String path = context.getPath().toString();
-            line = "%-7s %-20s %-18s %s%-8s%s %-16s".formatted(index, name, version, running ? RESET : BACKGROUND_RED, running, RESET, path);
+            line = "%-7s %-20s %-18s %s%-8s%s %-16s".formatted(index, name, version, running ? RESET : BACKGROUND_RED, hasService ? running : "", RESET, path);
             println(input, line);
         }
     }
 
     public static void moduleLoad(CommandInput input) {
-        processRequest(input, ModuleController::load);
+        String moduleName = input.args()[0];
+        ModuleController.load(moduleName);
+//        processRequest(input, ModuleController::load);
     }
 
     public static void moduleStop(CommandInput input) {

@@ -12,16 +12,13 @@ public class MainClass {
     private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
 
     static {
+        System.out.println("Application PID: " + ProcessHandle.current().pid());
         System.setProperty("dena.work-dir", workDir);
         logger.info("Dena work directory: {}", workDir);
     }
 
     static void main() {
-        System.out.println("Application PID: " + ProcessHandle.current().pid());
-
-        ModuleController.load("module.a");
-        ModuleController.load("ir.sample");
-
+        ModuleController.initStartUp();
         CommandLine.run();
     }
 }
