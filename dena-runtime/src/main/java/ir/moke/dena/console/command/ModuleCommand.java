@@ -13,7 +13,7 @@ import static ir.moke.dena.console.ConsoleUtils.println;
 
 public class ModuleCommand implements TtyAsciiCodecs {
     public static void moduleList(CommandInput input) {
-        String line = "%s%s%-7s %-20s %-18s %-8s %-16s %s".formatted(GREEN, BOLD, "index", "name", "version", "running", "path", RESET);
+        String line = "%s%s%-7s %-20s %-18s %-8s %s".formatted(GREEN, BOLD, "index", "name", "version", "running", RESET);
         println(input, line);
         List<ModuleContext> modules = ModuleRepository.list();
         for (int i = 0; i < modules.size(); i++) {
@@ -23,8 +23,7 @@ public class ModuleCommand implements TtyAsciiCodecs {
             String name = context.getName();
             String version = context.getVersion();
             boolean running = context.isRunning();
-            String path = context.getPath().toString();
-            line = "%-7s %-20s %-18s %s%-8s%s %-16s".formatted(index, name, version, running ? RESET : BACKGROUND_RED, hasService ? running : "", RESET, path);
+            line = "%-7s %-20s %-18s %s%-8s%s".formatted(index, name, version, running ? RESET : BACKGROUND_RED, hasService ? running : "", RESET);
             println(input, line);
         }
     }
