@@ -27,6 +27,7 @@ public class CommandRegistry implements org.jline.console.CommandRegistry {
         // Module Commands
         commandExecute.put("list", new CommandMethods(ModuleCommand::moduleList, this::defaultCompleter));
         commandExecute.put("load", new CommandMethods(ModuleCommand::moduleLoad, this::defaultCompleter));
+        commandExecute.put("unload", new CommandMethods(ModuleCommand::moduleUnload, this::defaultCompleter));
         commandExecute.put("stop", new CommandMethods(ModuleCommand::moduleStop, this::defaultCompleter));
         commandExecute.put("start", new CommandMethods(ModuleCommand::moduleStart, this::defaultCompleter));
 
@@ -37,6 +38,7 @@ public class CommandRegistry implements org.jline.console.CommandRegistry {
         // Command Description
         commandInfo.put("list", List.of("List all available modules"));
         commandInfo.put("load", List.of("Load a module from directory", "Usage: load <index>"));
+        commandInfo.put("unload", List.of("Unload a module from directory", "Usage: unload <index>"));
         commandInfo.put("stop", List.of("Stop a running module", "Usage: stop <index>"));
         commandInfo.put("start", List.of("Start a loaded module", "Usage: start <index>"));
         commandInfo.put("shutdown", List.of("Shutdown system"));
