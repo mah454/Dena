@@ -23,13 +23,14 @@ public class ModuleCommand implements TtyAsciiCodecs {
             String name = context.getName();
             String version = context.getVersion();
             boolean running = context.isRunning();
-            line = "%-7s %-20s %-18s %s%-8s%s".formatted(index, name, version, running ? RESET : BACKGROUND_RED, hasService ? running : "", RESET);
+            line = "%-7s %-20s %-18s %s%-8s%s".formatted(index, name, version, running ? RESET : hasService ? BACKGROUND_RED : RESET, hasService ? running : "", RESET);
             println(input, line);
         }
     }
 
     public static void moduleLoad(CommandInput input) {
-        processRequest(input, ModuleController::load);
+        String moduleName = input.args()[0];
+        ModuleController.load(moduleName);
     }
 
     public static void moduleUnload(CommandInput input) {
@@ -56,9 +57,9 @@ public class ModuleCommand implements TtyAsciiCodecs {
             controller.accept(context.getName());
         } catch (Exception e) {
             if (e instanceof IndexOutOfBoundsException) {
-                println(input, "[ERROR] Invalid index");
+                println(input, "%s[ERROR] Invalid index%s".formatted(BACKGROUND_RED, RESET));
             } else {
-                println(input, "[ERROR] %s".formatted(e.getMessage()));
+                println(input, "%s[ERROR] %s%s".formatted(BACKGROUND_RED, e.getMessage(), RESET));
             }
         }
     }

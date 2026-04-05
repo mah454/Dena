@@ -6,8 +6,8 @@ import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-public class CommandLine {
-
+public class CommandLine implements TtyAsciiCodecs {
+    private static final String PS1 = "%s DENA-JPMS-Prompt %s%s\uE0B0 %s".formatted(BACKGROUND_BLUE, RESET, BLUE, RESET);
     public static void run() {
         try {
             Terminal terminal = TerminalBuilder.builder().build();
@@ -39,7 +39,7 @@ public class CommandLine {
             while (true) {
                 try {
                     system.cleanUp();
-                    String line = reader.readLine("prompt> ", null, (MaskingCallback) null, null);
+                    String line = reader.readLine(PS1, null, (MaskingCallback) null, null);
                     system.execute(line);
                 } catch (UserInterruptException e) {
                     // Ignore

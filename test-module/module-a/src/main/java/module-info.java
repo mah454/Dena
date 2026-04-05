@@ -12,5 +12,4 @@ module module.a {
     requires org.slf4j;  // Often needed by Jackson for date types
 
     exports ir.moke.module.a;
-    provides ir.moke.dena.api.IModule with ir.moke.module.a.ModuleRunner;
 }

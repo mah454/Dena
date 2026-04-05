@@ -34,15 +34,17 @@ public class CommandRegistry implements org.jline.console.CommandRegistry {
         // System Commands
         commandExecute.put("shutdown", new CommandMethods(SystemCommand::exit, this::defaultCompleter));
         commandExecute.put("gc", new CommandMethods(SystemCommand::gc, this::defaultCompleter));
+        commandExecute.put("pid", new CommandMethods(SystemCommand::pid, this::defaultCompleter));
 
         // Command Description
         commandInfo.put("list", List.of("List all available modules"));
-        commandInfo.put("load", List.of("Load a module from directory", "Usage: load <index>"));
-        commandInfo.put("unload", List.of("Unload a module from directory", "Usage: unload <index>"));
+        commandInfo.put("load", List.of("Load module", "Usage: load <module.name>"));
+        commandInfo.put("unload", List.of("Unload module", "Usage: unload <index>"));
         commandInfo.put("stop", List.of("Stop a running module", "Usage: stop <index>"));
         commandInfo.put("start", List.of("Start a loaded module", "Usage: start <index>"));
         commandInfo.put("shutdown", List.of("Shutdown system"));
         commandInfo.put("gc", List.of("Call jvm gc"));
+        commandInfo.put("pid", List.of("Platform process id"));
     }
 
     @Override

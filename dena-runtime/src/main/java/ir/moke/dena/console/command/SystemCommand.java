@@ -17,4 +17,9 @@ public class SystemCommand {
         println(input, "[*] Call GC");
         System.gc();
     }
+
+    public static void pid(CommandInput input) {
+        long pid = ProcessHandle.current().pid();
+        println(input, "[*] PID: %s".formatted(pid));
+    }
 }

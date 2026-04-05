@@ -8,12 +8,10 @@ import ir.moke.dena.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.module.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -21,7 +19,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ModuleController implements GlobalVariables {
     private static final Logger logger = LoggerFactory.getLogger(ModuleController.class);
@@ -48,28 +45,11 @@ public class ModuleController implements GlobalVariables {
     }
 
     public static void initStartUp() {
-        try (Stream<Path> stream = Files.list(denaModulesDirectory)) {
-            stream.forEach(item -> {
-                try {
-                    String moduleName = item.getFileName().toString();
-
-                    ModuleFinder moduleFinder = ModuleFinder.of(item);
-                    for (ModuleReference moduleReference : moduleFinder.findAll()) {
-                        for (ModuleDescriptor.Requires req : moduleReference.descriptor().requires()) {
-                            boolean exists = FileUtils.isFileExists(denaModulesDirectory.resolve(req.name()));
-                            if (exists) {
-                                load(req.name());
-                            }
-                        }
-                    }
-
-                    load(moduleName);
-                } catch (Exception e) {
-                    logger.warn(e.getMessage());
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<Path> list = FileUtils.listFiles(denaModulesDirectory);
+        for (Path item : list) {
+            String moduleName = item.getFileName().toString();
+            loadDependencyModule(item);
+            load(moduleName);
         }
     }
 
@@ -81,6 +61,7 @@ public class ModuleController implements GlobalVariables {
                 throw new IllegalStateException("Module %s directory not exists".formatted(moduleName));
             }
             URLClassLoader classLoader = new URLClassLoader(new URL[]{modulePath.toUri().toURL()});
+            loadDependencyModule(modulePath);
             ModuleLayer moduleLayer = createLayer(modulePath, classLoader);
 
             // module
@@ -116,10 +97,9 @@ public class ModuleController implements GlobalVariables {
     public static void unload(String moduleName) {
         try {
             ModuleContext context = ModuleRepository.get(moduleName);
-            URLClassLoader classLoader = context.getClassLoader();
-            logger.info("[{}] - Close classLoader", moduleName);
-            classLoader.close();
-            logger.info("[{}] - CleanUp module repository", moduleName);
+            unloadDependencyModule(context);
+            stop(moduleName);
+            deactivateModule(context);
             ModuleRepository.remove(moduleName);
         } catch (Exception e) {
             logger.warn(e.getMessage());
@@ -173,6 +153,8 @@ public class ModuleController implements GlobalVariables {
 //            throw new RuntimeException("Module %s does not implement IModule interface".formatted(moduleContext.getName()));
 //        }
 
+        if (providers.isEmpty()) return null;
+
         if (providers.size() > 1) {
             String implementations = providers.stream()
                     .map(p -> p.type().getName() + " (" + p.type().getModule().getName() + ")")
@@ -205,6 +187,8 @@ public class ModuleController implements GlobalVariables {
 
             // set context executor service
             context.setExecutorService(executorService);
+        } else {
+            throw new IllegalStateException("Module %s does not implemented IModule interface".formatted(moduleName));
         }
     }
 
@@ -213,11 +197,6 @@ public class ModuleController implements GlobalVariables {
         if (context == null) throw new IllegalStateException("Module %s does not exists".formatted(moduleName));
         if (!context.isRunning()) return;
         IModule iModule = context.getIModule();
-        URLClassLoader classLoader = context.getClassLoader();
-
-        // fixme: need do this ?!
-        // listOnUsedModules(moduleName).stream().map(ModuleContext::getName).forEach(ModuleController::stop);
-
         // Try to unload module
         try (ExecutorService es = context.getExecutorService()) {
 
@@ -255,6 +234,7 @@ public class ModuleController implements GlobalVariables {
         context.setClassLoader(null);
         context.setExecutorService(null);
         context.setLayer(null);
+        ModuleRepository.remove(context);
     }
 
     private static List<ModuleContext> listOnUsedModules(String moduleName) {
@@ -271,6 +251,32 @@ public class ModuleController implements GlobalVariables {
         }
 
         return list;
+    }
+
+    private static void loadDependencyModule(Path item) {
+        try {
+            ModuleFinder moduleFinder = ModuleFinder.of(item);
+            for (ModuleReference moduleReference : moduleFinder.findAll()) {
+                for (ModuleDescriptor.Requires req : moduleReference.descriptor().requires()) {
+                    boolean exists = FileUtils.isFileExists(denaModulesDirectory.resolve(req.name()));
+                    if (exists) {
+                        load(req.name());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
+    }
+
+    private static void unloadDependencyModule(ModuleContext context) {
+        for (ModuleLayer parent : context.getLayer().parents()) {
+            for (Module module : parent.modules()) {
+                if (ModuleRepository.isExists(module.getName())) {
+                    unload(module.getName());
+                }
+            }
+        }
     }
 
     private static boolean isModuleExists(String moduleName) {
