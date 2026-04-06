@@ -51,3 +51,4 @@ docker/lib
 **/shared/
 **/logs/
 **/framework/
+**/dena/

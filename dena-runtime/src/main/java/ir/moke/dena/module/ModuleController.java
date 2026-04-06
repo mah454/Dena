@@ -25,7 +25,6 @@ public class ModuleController implements GlobalVariables {
     private static final ExecutorService controllerExecutorService = Executors.newSingleThreadExecutor();
 
     static {
-        FileUtils.createDirectory(denaModulesDirectory);
         listenWorkDir();
     }
 

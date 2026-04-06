@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 public class MainClass implements TtyAsciiCodecs {
-    private static final String workDir = Optional.ofNullable(System.getenv("DENA.WORK-DIR")).orElse(System.getProperty("user.dir"));
+    private static final String workDir = Optional.ofNullable(System.getenv("DENA_WORK_DIR")).orElse(System.getProperty("user.dir"));
     private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
 
     static {

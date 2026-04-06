@@ -1,0 +1,13 @@
+#!/bin/bash
+
+export CMD="java"
+export DENA_WORK_DIR=$(dirname $0)
+cd ${DENA_WORK_DIR}
+
+[[ $1 == "-d" ]] && CMD="java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+exec ${CMD} \
+  -p lib/shared:lib/framework \
+  --add-modules ALL-MODULE-PATH \
+  -cp .:lib/system/* \
+  ir.moke.dena.MainClass
