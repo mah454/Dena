@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export CMD="java"
-export DENA_WORK_DIR=$(dirname $0)
-cd ${DENA_WORK_DIR}
+export SCRIPT_LOCATION=$(dirname $0)
+cd ${SCRIPT_LOCATION}
 
 [[ $1 == "-d" ]] && CMD="java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 

@@ -34,6 +34,7 @@ public class ModuleRepository implements GlobalVariables {
     }
 
     public static Set<ModuleContext> list() {
+        // list all directories could be modules
         Set<ModuleContext> list = new HashSet<>(FileUtils.listFiles(denaModulesDirectory)
                 .stream()
                 .filter(Files::isDirectory)
