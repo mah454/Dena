@@ -47,8 +47,8 @@ docker/lib
 *.zip
 *.xz
 *.img
-**/modules/
-**/shared/
-**/logs/
-**/framework/
-**/dena/
+modules/
+shared/
+logs/
+framework/
+dena/
