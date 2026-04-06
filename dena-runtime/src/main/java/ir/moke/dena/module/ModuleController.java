@@ -193,8 +193,7 @@ public class ModuleController implements GlobalVariables {
 
     public static void stop(String moduleName) {
         ModuleContext context = ModuleRepository.get(moduleName);
-        if (context == null) throw new IllegalStateException("Module %s does not exists".formatted(moduleName));
-        if (!context.isRunning()) return;
+        if (context == null || !context.isRunning()) return;
         IModule iModule = context.getIModule();
         // Try to unload module
         try (ExecutorService es = context.getExecutorService()) {

@@ -9,7 +9,10 @@ import static ir.moke.dena.console.ConsoleUtils.println;
 
 public class SystemCommand {
     public static void exit(CommandInput input) {
-        ModuleRepository.list().stream().map(ModuleContext::getName).forEach(ModuleController::stop);
+        ModuleRepository.list()
+                .stream()
+                .map(ModuleContext::getName)
+                .forEach(ModuleController::stop);
         System.exit(0);
     }
 

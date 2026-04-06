@@ -6,6 +6,7 @@ import ir.moke.dena.module.ModuleController;
 import ir.moke.dena.module.ModuleRepository;
 import org.jline.console.CommandInput;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -15,7 +16,7 @@ public class ModuleCommand implements TtyAsciiCodecs {
     public static void moduleList(CommandInput input) {
         String line = "%s%s%-7s %-20s %-18s %-8s %s".formatted(GREEN, BOLD, "index", "name", "version", "running", RESET);
         println(input, line);
-        List<ModuleContext> modules = ModuleRepository.list();
+        List<ModuleContext> modules = new ArrayList<>(ModuleRepository.list());
         for (int i = 0; i < modules.size(); i++) {
             ModuleContext context = modules.get(i);
             boolean hasService = context.getIModule() != null;
@@ -53,7 +54,7 @@ public class ModuleCommand implements TtyAsciiCodecs {
                 println(input, "[WARN] invalid index");
                 return;
             }
-            ModuleContext context = ModuleRepository.list().get(index - 1);
+            ModuleContext context = new ArrayList<>(ModuleRepository.list()).get(index - 1);
             controller.accept(context.getName());
         } catch (Exception e) {
             if (e instanceof IndexOutOfBoundsException) {

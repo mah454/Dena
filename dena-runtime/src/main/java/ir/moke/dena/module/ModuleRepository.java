@@ -1,13 +1,18 @@
 package ir.moke.dena.module;
 
+import ir.moke.dena.GlobalVariables;
+import ir.moke.dena.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ModuleRepository {
+public class ModuleRepository implements GlobalVariables {
     private static final Logger logger = LoggerFactory.getLogger(ModuleRepository.class);
     private static final List<ModuleContext> MODULES = new ArrayList<>();
 
@@ -28,8 +33,16 @@ public class ModuleRepository {
                 .orElse(null);
     }
 
-    public static List<ModuleContext> list() {
-        return MODULES;
+    public static Set<ModuleContext> list() {
+        Set<ModuleContext> list = new HashSet<>(FileUtils.listFiles(denaModulesDirectory)
+                .stream()
+                .filter(Files::isDirectory)
+                .map(item -> new ModuleContext(item.getFileName().toString(), item))
+                .toList());
+
+        list.removeAll(MODULES);
+        list.addAll(MODULES);
+        return list;
     }
 
     public static void remove(String name) {

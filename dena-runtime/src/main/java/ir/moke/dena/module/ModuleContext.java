@@ -23,6 +23,11 @@ public class ModuleContext {
     public ModuleContext() {
     }
 
+    public ModuleContext(String name, Path path) {
+        this.name = name;
+        this.path = path;
+    }
+
     public ModuleContext(ModuleLayer layer, Path path, String name, String description, String maintainer, String url) {
         this.layer = layer;
         this.path = path;
