@@ -2,7 +2,7 @@ package ir.moke.dena;
 
 import ir.moke.dena.console.CommandLine;
 import ir.moke.dena.console.TtyAsciiCodecs;
-import ir.moke.dena.module.ModuleController;
+import ir.moke.dena.jpms.ModuleController;
 import ir.moke.dena.utils.Logo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package ir.moke.dena.module;
+package ir.moke.dena.jpms;
 
 import ir.moke.dena.GlobalVariables;
 import ir.moke.dena.utils.FileUtils;

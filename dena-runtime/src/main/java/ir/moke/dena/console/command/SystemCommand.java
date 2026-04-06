@@ -1,8 +1,8 @@
 package ir.moke.dena.console.command;
 
-import ir.moke.dena.module.ModuleContext;
-import ir.moke.dena.module.ModuleController;
-import ir.moke.dena.module.ModuleRepository;
+import ir.moke.dena.jpms.ModuleContext;
+import ir.moke.dena.jpms.ModuleController;
+import ir.moke.dena.jpms.ModuleRepository;
 import org.jline.console.CommandInput;
 
 import static ir.moke.dena.console.ConsoleUtils.println;
