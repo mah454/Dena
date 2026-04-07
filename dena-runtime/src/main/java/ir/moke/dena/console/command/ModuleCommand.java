@@ -31,8 +31,7 @@ public class ModuleCommand implements TtyAsciiCodecs {
     }
 
     public static void moduleLoad(CommandInput input) {
-        String moduleName = input.args()[0];
-        ModuleController.load(moduleName);
+        processRequest(input, ModuleController::load);
     }
 
     public static void moduleUnload(CommandInput input) {
