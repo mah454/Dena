@@ -125,6 +125,10 @@ public class ModuleContext {
         this.classLoader = classLoader;
     }
 
+    public boolean isLoaded() {
+        return classLoader != null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -145,10 +149,10 @@ public class ModuleContext {
 
     public String toJson() {
         return """
-                {"name": "%s","version": "%s","running": "%s","path": "%s","description": "%s","maintainer": "%s","url": "%s"}
+                {"name": "%s","version": "%s","running": "%s","loaded": "%s","path": "%s","description": "%s","maintainer": "%s","url": "%s"}
                 """
-                .formatted(name, version, running, path.toString(), description, maintainer, url)
-                .replaceAll("\"null\"","null")
+                .formatted(name, version, isLoaded(), running, path.toString(), description, maintainer, url)
+                .replaceAll("\"null\"", "null")
                 .trim();
     }
 }
