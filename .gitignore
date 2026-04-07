@@ -50,5 +50,6 @@ docker/lib
 modules/
 shared/
 logs/
+log/
 framework/
-dena/
+app/

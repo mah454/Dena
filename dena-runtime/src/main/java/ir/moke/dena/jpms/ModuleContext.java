@@ -142,4 +142,13 @@ public class ModuleContext {
     public String toString() {
         return "Name: %s | Started: %s | Maintainer: %s | Path: %s".formatted(name, isRunning(), maintainer, path);
     }
+
+    public String toJson() {
+        return """
+                {"name": "%s","version": "%s","running": "%s","path": "%s","description": "%s","maintainer": "%s","url": "%s"}
+                """
+                .formatted(name, version, running, path.toString(), description, maintainer, url)
+                .replaceAll("\"null\"","null")
+                .trim();
+    }
 }

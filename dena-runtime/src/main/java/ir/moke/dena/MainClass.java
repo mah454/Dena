@@ -4,6 +4,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ir.moke.dena.console.CommandLine;
 import ir.moke.dena.console.TtyAsciiCodecs;
+import ir.moke.dena.http.ApiServer;
 import ir.moke.dena.jpms.ModuleController;
 import ir.moke.dena.utils.Logo;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class MainClass implements TtyAsciiCodecs {
 
     static void main() {
         ModuleController.initStartUp();
+        ApiServer.start();
         CommandLine.run();
     }
 }
