@@ -166,7 +166,7 @@ public class ModuleController implements GlobalVariables {
 
     public static void start(String moduleName) {
         ModuleContext context = ModuleRepository.get(moduleName);
-        if (context == null) throw new IllegalStateException("Module %s do not loaded yet".formatted(moduleName));
+        if (context == null) throw new IllegalStateException("Module %s not loaded yet".formatted(moduleName));
         IModule iModule = context.getIModule();
 
         if (iModule != null && !context.isRunning()) {
