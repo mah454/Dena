@@ -6,6 +6,8 @@ cd ${SCRIPT_LOCATION}
 
 [[ $1 == "-d" ]] && CMD="java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 
+[[ -f env ]] && . env
+
 exec ${CMD} \
   -p lib/shared:framework \
   --add-modules ALL-MODULE-PATH \
