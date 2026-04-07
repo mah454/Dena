@@ -151,7 +151,7 @@ public class ModuleContext {
         return """
                 {"name": "%s","version": "%s","running": "%s","loaded": "%s","path": "%s","description": "%s","maintainer": "%s","url": "%s"}
                 """
-                .formatted(name, version, isLoaded(), running, path.toString(), description, maintainer, url)
+                .formatted(name, version, running, isLoaded(), path.toString(), description, maintainer, url)
                 .replaceAll("\"null\"", "null")
                 .trim();
     }
