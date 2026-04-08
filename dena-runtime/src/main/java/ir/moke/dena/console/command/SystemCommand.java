@@ -1,14 +1,11 @@
 package ir.moke.dena.console.command;
 
-import ir.moke.dena.jpms.ModuleController;
-import ir.moke.dena.jpms.ModuleRepository;
 import org.jline.console.CommandInput;
 
 import static ir.moke.dena.console.ConsoleUtils.println;
 
 public class SystemCommand {
     public static void exit(CommandInput input) {
-        ModuleRepository.list().forEach(ModuleController::shutdown);
         System.exit(0);
     }
 

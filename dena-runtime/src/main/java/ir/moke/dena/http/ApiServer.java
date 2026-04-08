@@ -10,11 +10,16 @@ public class ApiServer {
 
     static {
         try {
+            Runtime.getRuntime().addShutdownHook(new Thread(ApiServer::triggerShutdownHook));
             server = HttpServer.create(new InetSocketAddress(2120), 0);
             server.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void triggerShutdownHook() {
+        server.stop(0);
     }
 
     public static void start() {

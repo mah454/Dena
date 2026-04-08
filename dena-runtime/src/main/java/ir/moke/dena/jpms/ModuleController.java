@@ -25,6 +25,7 @@ public class ModuleController implements GlobalVariables {
     private static final ExecutorService controllerExecutorService = Executors.newSingleThreadExecutor();
 
     static {
+        Runtime.getRuntime().addShutdownHook(new Thread(ModuleController::triggerShutdownHook));
         listenWorkDir();
     }
 
@@ -301,5 +302,9 @@ public class ModuleController implements GlobalVariables {
     private static void triggerGC() {
         logger.info("Trigger GC");
         System.gc();
+    }
+
+    private static void triggerShutdownHook() {
+        ModuleRepository.list().forEach(ModuleController::shutdown);
     }
 }
