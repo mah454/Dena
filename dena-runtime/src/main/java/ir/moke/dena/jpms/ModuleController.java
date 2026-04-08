@@ -46,9 +46,18 @@ public class ModuleController implements GlobalVariables {
     public static void initStartUp() {
         List<Path> list = FileUtils.listFiles(denaModulesDirectory);
         for (Path item : list) {
+            boolean load = Optional.of(Boolean.parseBoolean(FileUtils.getProperty("load", item))).orElse(false);
+            boolean start = Optional.of(Boolean.parseBoolean(FileUtils.getProperty("start", item))).orElse(false);
             String moduleName = item.getFileName().toString();
-            loadDependencyModule(item);
-            load(moduleName);
+
+            if (load) {
+                loadDependencyModule(item);
+                load(moduleName);
+            }
+
+            if (start) {
+                start(moduleName);
+            }
         }
     }
 
@@ -87,6 +96,7 @@ public class ModuleController implements GlobalVariables {
             context.setClassLoader(classLoader);
             optionalVersion.ifPresent(item -> context.setVersion(item.toString()));
             ModuleRepository.add(context);
+            FileUtils.storeProperty("load", "true", modulePath);
             logger.info("[{}] - Module loaded", moduleName);
         } catch (Exception e) {
             logger.warn(e.getMessage());
@@ -100,6 +110,7 @@ public class ModuleController implements GlobalVariables {
             stop(moduleName);
             deactivateModule(context);
             ModuleRepository.remove(moduleName);
+            FileUtils.storeProperty("load", "false", context.getPath());
         } catch (Exception e) {
             logger.warn(e.getMessage());
         } finally {
@@ -176,6 +187,7 @@ public class ModuleController implements GlobalVariables {
                 try {
                     iModule.start();
                     context.setRunning(true);
+                    FileUtils.storeProperty("start", "true", context.getPath());
                 } catch (Exception e) {
                     logger.error("Module error", e);
                     context.setExecutorService(null);
@@ -191,9 +203,9 @@ public class ModuleController implements GlobalVariables {
         }
     }
 
-    public static void stop(String moduleName) {
-        ModuleContext context = ModuleRepository.get(moduleName);
-        if (context == null || !context.isRunning()) return;
+    public static void shutdown(ModuleContext context) {
+        String moduleName = context.getName();
+        if (!context.isRunning()) return;
         IModule iModule = context.getIModule();
         // Try to unload module
         try (ExecutorService es = context.getExecutorService()) {
@@ -211,6 +223,12 @@ public class ModuleController implements GlobalVariables {
         } finally {
             triggerGC();
         }
+    }
+
+    public static void stop(String moduleName) {
+        ModuleContext context = ModuleRepository.get(moduleName);
+        shutdown(context);
+        FileUtils.storeProperty("start", "false", context.getPath());
     }
 
     private static Path getIModuleJarFile(ModuleLayer moduleLayer, String moduleName) {
