@@ -39,8 +39,9 @@ public class ModuleController implements GlobalVariables {
         Path moduleDirPath = ev.context();
         String moduleName = moduleDirPath.getFileName().toString();
         listOnUsedModules(moduleName).stream().map(ModuleContext::getName).forEach(ModuleController::stop);
-        stop(moduleName);
-        deactivateModule(ModuleRepository.get(moduleName));
+        ModuleContext moduleContext = ModuleRepository.get(moduleName);
+        shutdown(moduleContext);
+        deactivateModule(moduleContext);
     }
 
     public static void initStartUp() {
