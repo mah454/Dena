@@ -40,6 +40,7 @@ public class ModuleController implements GlobalVariables {
         String moduleName = moduleDirPath.getFileName().toString();
         listOnUsedModules(moduleName).stream().map(ModuleContext::getName).forEach(ModuleController::stop);
         ModuleContext moduleContext = ModuleRepository.get(moduleName);
+        unloadDependentModule(moduleContext);
         shutdown(moduleContext);
         deactivateModule(moduleContext);
     }
