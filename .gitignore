@@ -41,6 +41,7 @@ nb-configuration.xml
 tomcat*
 docker/jre
 docker/lib
+docker/dena
 *.tar
 *.gz
 *.bz
