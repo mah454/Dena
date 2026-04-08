@@ -6,4 +6,6 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 COPY jre /opt/jre
 COPY dena /opt/dena
 
+RUN ln -s /opt/dena /dena
+
 CMD ["/opt/dena/dena-runner"]

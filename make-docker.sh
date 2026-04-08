@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./build.sh
+./make-project.sh
 
 rm -rf docker/dena
 cp -aRvf build/dena docker/
