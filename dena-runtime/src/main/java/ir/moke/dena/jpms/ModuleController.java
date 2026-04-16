@@ -80,11 +80,7 @@ public class ModuleController implements GlobalVariables {
             if (moduleJarPath == null || !FileUtils.isFileExists(moduleJarPath)) {
                 throw new IllegalStateException("ModuleLayer not contain module with name %s".formatted(moduleName));
             }
-            Module module = moduleLayer.modules()
-                    .stream()
-                    .filter(item -> item.getName().equals(moduleName))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Module does not exists"));
+            Module module = moduleLayer.modules().stream().filter(item -> item.getName().equals(moduleName)).findFirst().orElseThrow(() -> new IllegalStateException("Module does not exists"));
 
             // detect metadata
             ModuleMetadata metadata = module.getDeclaredAnnotation(ModuleMetadata.class);
@@ -129,12 +125,7 @@ public class ModuleController implements GlobalVariables {
             List<ModuleLayer> parentLayers = moduleFinder.getParentLayers();
             List<Configuration> parentConfigurations = moduleFinder.getParentConfigurations();
 
-            Configuration configuration = Configuration.resolveAndBind(
-                    moduleFinder,
-                    parentConfigurations,
-                    ModuleFinder.of(),
-                    List.of(targetModuleName)
-            );
+            Configuration configuration = Configuration.resolveAndBind(moduleFinder, parentConfigurations, ModuleFinder.of(), List.of(targetModuleName));
 
             logger.info("[{}] - Create module layer", targetModuleName);
             return ModuleLayer.defineModulesWithOneLoader(configuration, parentLayers, classLoader).layer();
@@ -147,20 +138,13 @@ public class ModuleController implements GlobalVariables {
         ModuleLayer layer = moduleContext.getLayer();
 
         // Get modules that are actually IN this layer (not parents)
-        Set<String> currentLayerModuleNames = layer.modules()
-                .stream()
-                .map(Module::getName)
-                .collect(Collectors.toSet());
+        Set<String> currentLayerModuleNames = layer.modules().stream().map(Module::getName).collect(Collectors.toSet());
 
         // Filter providers to only those from the current layer
-        List<ServiceLoader.Provider<IModule>> providers = ServiceLoader
-                .load(layer, IModule.class)
-                .stream()
-                .filter(provider -> {
-                    String providerModuleName = provider.type().getModule().getName();
-                    return currentLayerModuleNames.contains(providerModuleName);
-                })
-                .toList();
+        List<ServiceLoader.Provider<IModule>> providers = ServiceLoader.load(layer, IModule.class).stream().filter(provider -> {
+            String providerModuleName = provider.type().getModule().getName();
+            return currentLayerModuleNames.contains(providerModuleName);
+        }).toList();
 
 //        if (providers.isEmpty()) {
 //            throw new RuntimeException("Module %s does not implement IModule interface".formatted(moduleContext.getName()));
@@ -169,9 +153,7 @@ public class ModuleController implements GlobalVariables {
         if (providers.isEmpty()) return null;
 
         if (providers.size() > 1) {
-            String implementations = providers.stream()
-                    .map(p -> p.type().getName() + " (" + p.type().getModule().getName() + ")")
-                    .collect(Collectors.joining(", "));
+            String implementations = providers.stream().map(p -> p.type().getName() + " (" + p.type().getModule().getName() + ")").collect(Collectors.joining(", "));
             throw new RuntimeException("More than one IModule implementation found in module %s: %s".formatted(moduleContext.getName(), implementations));
         }
 
@@ -195,7 +177,7 @@ public class ModuleController implements GlobalVariables {
                     logger.error("Module error", e);
                     context.setExecutorService(null);
                     context.setRunning(false);
-                    executorService.shutdown();
+                    executorService.shutdownNow();
                 }
             });
 
@@ -217,7 +199,7 @@ public class ModuleController implements GlobalVariables {
             iModule.stop();
 
             logger.info("[{}] - Shutdown module executor service", moduleName);
-            es.shutdown();
+            es.shutdownNow();
 
             logger.info("[{}] - CleaUp references", moduleName);
             context.setRunning(false);
@@ -235,13 +217,7 @@ public class ModuleController implements GlobalVariables {
     }
 
     private static Path getIModuleJarFile(ModuleLayer moduleLayer, String moduleName) {
-        return moduleLayer.configuration()
-                .findModule(moduleName)
-                .map(ResolvedModule::reference)
-                .flatMap(ModuleReference::location)
-                .map(URI::getPath)
-                .map(Path::of)
-                .orElse(null);
+        return moduleLayer.configuration().findModule(moduleName).map(ResolvedModule::reference).flatMap(ModuleReference::location).map(URI::getPath).map(Path::of).orElse(null);
     }
 
     private static String getModuleName(Path path) {
@@ -260,12 +236,7 @@ public class ModuleController implements GlobalVariables {
         List<ModuleContext> list = new ArrayList<>();
         for (ModuleContext context : ModuleRepository.list()) {
             for (ModuleLayer parent : context.getLayer().parents()) {
-                parent.modules()
-                        .stream()
-                        .map(Module::getName)
-                        .filter(item -> item.equals(moduleName))
-                        .findFirst()
-                        .ifPresent(_ -> list.add(context));
+                parent.modules().stream().map(Module::getName).filter(item -> item.equals(moduleName)).findFirst().ifPresent(_ -> list.add(context));
             }
         }
 
@@ -289,10 +260,7 @@ public class ModuleController implements GlobalVariables {
     }
 
     private static void unloadDependentModule(ModuleContext context) {
-        ModuleRepository.findDependentModules(context)
-                .stream()
-                .map(ModuleContext::getName)
-                .forEach(ModuleController::unload);
+        ModuleRepository.findDependentModules(context).stream().map(ModuleContext::getName).forEach(ModuleController::unload);
     }
 
     private static boolean isModuleExists(String moduleName) {
