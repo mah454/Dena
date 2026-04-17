@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 import static ir.moke.dena.console.ConsoleUtils.println;
 
-public class ModuleCommand implements TtyAsciiCodecs {
+public class DenaCommand implements TtyAsciiCodecs {
     public static void moduleList(CommandInput input) {
         String line = "%s%s%-7s %-20s %-18s %-8s %-8s %s".formatted(GREEN, BOLD, "index", "name", "version", "loaded", "running", RESET);
         println(input, line);

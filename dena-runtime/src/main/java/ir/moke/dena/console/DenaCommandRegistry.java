@@ -1,6 +1,6 @@
 package ir.moke.dena.console;
 
-import ir.moke.dena.console.command.ModuleCommand;
+import ir.moke.dena.console.command.DenaCommand;
 import ir.moke.dena.console.command.SystemCommand;
 import org.jline.console.CmdDesc;
 import org.jline.console.CommandInput;
@@ -23,11 +23,11 @@ public class DenaCommandRegistry implements CommandRegistry {
 
     public DenaCommandRegistry() {
         // Module Commands
-        commandExecute.put("list", new CommandMethods(ModuleCommand::moduleList, this::defaultCompleter));
-        commandExecute.put("load", new CommandMethods(ModuleCommand::moduleLoad, this::defaultCompleter));
-        commandExecute.put("unload", new CommandMethods(ModuleCommand::moduleUnload, this::defaultCompleter));
-        commandExecute.put("stop", new CommandMethods(ModuleCommand::moduleStop, this::defaultCompleter));
-        commandExecute.put("start", new CommandMethods(ModuleCommand::moduleStart, this::defaultCompleter));
+        commandExecute.put("list", new CommandMethods(DenaCommand::moduleList, this::defaultCompleter));
+        commandExecute.put("load", new CommandMethods(DenaCommand::moduleLoad, this::defaultCompleter));
+        commandExecute.put("unload", new CommandMethods(DenaCommand::moduleUnload, this::defaultCompleter));
+        commandExecute.put("stop", new CommandMethods(DenaCommand::moduleStop, this::defaultCompleter));
+        commandExecute.put("start", new CommandMethods(DenaCommand::moduleStart, this::defaultCompleter));
 
         // System Commands
         commandExecute.put("shutdown", new CommandMethods(SystemCommand::exit, this::defaultCompleter));
