@@ -1,5 +1,6 @@
 package ir.moke.dena.console;
 
+import org.jline.console.CommandRegistry;
 import org.jline.console.SystemRegistry;
 import org.jline.console.impl.SystemRegistryImpl;
 import org.jline.reader.*;
@@ -8,19 +9,23 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DenaCLI implements TtyAsciiCodecs {
     private static final String PS1 = "%s DENA %s%s\uE0B0 %s".formatted(BACKGROUND_BLUE, RESET, BLUE, RESET);
     private static final Parser parser = new DefaultParser();
-    private static final DenaCommandRegistry denaCommandRegistry = new DenaCommandRegistry();
+    private static final CommandRegistry denaCommandRegistry = new DenaCommandRegistry();
     private static final SystemRegistry system;
     private static final Terminal terminal;
+    private static final Set<CommandRegistry> registryList = new HashSet<>();
 
     static {
         try {
             terminal = TerminalBuilder.builder().build();
             system = new SystemRegistryImpl(parser, terminal, null, null);
             system.setCommandRegistries(denaCommandRegistry);
+            registryList.add(denaCommandRegistry);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,11 +64,13 @@ public class DenaCLI implements TtyAsciiCodecs {
         }
     }
 
-    public static void addSystemRegistry(SystemRegistry registry) {
-        SystemRegistry.add(registry);
+    public static void addSystemRegistry(CommandRegistry registry) {
+        registryList.add(registry);
+        system.setCommandRegistries(registryList.toArray(CommandRegistry[]::new));
     }
 
-    public static void removeCommandRegistry() {
-        SystemRegistry.remove();
+    public static void removeCommandRegistry(CommandRegistry registry) {
+        registryList.remove(registry);
+        system.setCommandRegistries(registryList.toArray(CommandRegistry[]::new));
     }
 }
