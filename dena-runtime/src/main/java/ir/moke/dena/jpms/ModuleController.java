@@ -164,28 +164,31 @@ public class ModuleController implements GlobalVariables {
         ModuleContext context = ModuleRepository.get(moduleName);
         if (context == null) throw new IllegalStateException("Module %s not loaded yet".formatted(moduleName));
         IModule iModule = context.getIModule();
+        if (context.isRunning()) {
+            throw new IllegalStateException("Module %s already running".formatted(moduleName));
+        }
 
-        if (iModule != null && !context.isRunning()) {
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            logger.info("[{}] - Start module", moduleName);
-            executorService.submit(() -> {
-                try {
-                    iModule.start();
-                    context.setRunning(true);
-                    FileUtils.storeProperty("start", "true", context.getPath());
-                } catch (Exception e) {
-                    logger.error("Module error", e);
-                    context.setExecutorService(null);
-                    context.setRunning(false);
-                    executorService.shutdownNow();
-                }
-            });
-
-            // set context executor service
-            context.setExecutorService(executorService);
-        } else {
+        if (iModule == null) {
             throw new IllegalStateException("Module %s does not implemented IModule interface".formatted(moduleName));
         }
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        logger.info("[{}] - Start module", moduleName);
+        executorService.submit(() -> {
+            try {
+                iModule.start();
+                context.setRunning(true);
+                FileUtils.storeProperty("start", "true", context.getPath());
+            } catch (Exception e) {
+                logger.error("Module error", e);
+                context.setExecutorService(null);
+                context.setRunning(false);
+                executorService.shutdownNow();
+            }
+        });
+
+        // set context executor service
+        context.setExecutorService(executorService);
     }
 
     public static void shutdown(ModuleContext context) {
@@ -212,6 +215,7 @@ public class ModuleController implements GlobalVariables {
 
     public static void stop(String moduleName) {
         ModuleContext context = ModuleRepository.get(moduleName);
+        if (context == null || !context.isLoaded()) throw new IllegalStateException("Module %s not loaded yet".formatted(moduleName));
         shutdown(context);
         FileUtils.storeProperty("start", "false", context.getPath());
     }
