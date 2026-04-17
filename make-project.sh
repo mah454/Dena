@@ -15,9 +15,9 @@ cp -aRvf ./test-module/module-a/target/module-a-0.1.jar ./build/dena/modules/mod
 cp -aRvf ./test-module/module-b/target/module-b-0.1.jar ./build/dena/modules/ir.sample/
 
 # Copy dena-api to shared
-mv -vf ./dena-runtime/target/lib/dena-api* ./build/dena/lib/shared/
-mv -vf ./dena-runtime/target/lib/*slf4j* ./build/dena/lib/shared/
-mv -vf ./dena-runtime/target/lib/* ./build/dena/lib/system/
+cp -aRvf ./dena-runtime/target/lib/dena-api* ./build/dena/lib/shared/
+cp -aRvf ./dena-runtime/target/lib/*slf4j* ./build/dena/lib/shared/
+cp -aRvf ./dena-runtime/target/lib/* ./build/dena/lib/system/
 
 # Copy configs
 cp -aRvf ./dena-runtime/src/main/resources/logback.xml ./build/dena/conf/
