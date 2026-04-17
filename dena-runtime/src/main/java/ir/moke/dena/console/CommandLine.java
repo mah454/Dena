@@ -1,28 +1,34 @@
 package ir.moke.dena.console;
 
+import org.jline.console.CommandRegistry;
+import org.jline.console.SystemRegistry;
 import org.jline.console.impl.SystemRegistryImpl;
 import org.jline.reader.*;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
+import java.io.IOException;
+
 public class CommandLine implements TtyAsciiCodecs {
     private static final String PS1 = "%s DENA %s%s\uE0B0 %s".formatted(BACKGROUND_BLUE, RESET, BLUE, RESET);
+    private static final Parser parser = new DefaultParser();
+    private static final DenaCommandRegistry denaCommandRegistry = new DenaCommandRegistry();
+    private static final SystemRegistry system;
+    private static final Terminal terminal;
+
+    static {
+        try {
+            terminal = TerminalBuilder.builder().build();
+            system = new SystemRegistryImpl(parser, terminal, null, null);
+            system.setCommandRegistries(denaCommandRegistry);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void run() {
         try {
-            Terminal terminal = TerminalBuilder.builder().build();
-            Parser parser = new DefaultParser();
-            //
-            // Command registers
-            //
-            CommandRegistry commandRegistry = new CommandRegistry();
-            SystemRegistryImpl system = new SystemRegistryImpl(parser, terminal, null, null);
-
-            system.setCommandRegistries(commandRegistry);
-            //
-            // Terminal & LineReader
-            //
             LineReader reader = LineReaderBuilder.builder()
                     .terminal(terminal)
                     .completer(system.completer())
@@ -31,8 +37,7 @@ public class CommandLine implements TtyAsciiCodecs {
                     .option(LineReader.Option.INSERT_BRACKET, true)
                     .option(LineReader.Option.EMPTY_WORD_OPTIONS, false)
                     .build();
-
-            commandRegistry.setLineReader(reader);
+            
             //
             // REPL-loop
             //
@@ -53,5 +58,9 @@ public class CommandLine implements TtyAsciiCodecs {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void applyCommandRegistry(CommandRegistry commandRegistry) {
+        system.setCommandRegistries(commandRegistry);
     }
 }

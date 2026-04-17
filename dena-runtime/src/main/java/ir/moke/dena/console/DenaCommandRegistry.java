@@ -5,11 +5,10 @@ import ir.moke.dena.console.command.SystemCommand;
 import org.jline.console.CmdDesc;
 import org.jline.console.CommandInput;
 import org.jline.console.CommandMethods;
+import org.jline.console.CommandRegistry;
 import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
 import org.jline.reader.impl.completer.NullCompleter;
 import org.jline.reader.impl.completer.SystemCompleter;
-import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
 
 import java.util.HashMap;
@@ -17,13 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CommandRegistry implements org.jline.console.CommandRegistry {
-    private LineReader reader;
+public class DenaCommandRegistry implements CommandRegistry {
     private final Map<String, CommandMethods> commandExecute = new HashMap<>();
     private final Map<String, List<String>> commandInfo = new HashMap<>();
     private final Map<String, String> aliasCommand = new HashMap<>();
 
-    public CommandRegistry() {
+    public DenaCommandRegistry() {
         // Module Commands
         commandExecute.put("list", new CommandMethods(ModuleCommand::moduleList, this::defaultCompleter));
         commandExecute.put("load", new CommandMethods(ModuleCommand::moduleLoad, this::defaultCompleter));
@@ -50,14 +48,6 @@ public class CommandRegistry implements org.jline.console.CommandRegistry {
     @Override
     public String name() {
         return "Dena JPMS Available Commands";
-    }
-
-    public void setLineReader(LineReader reader) {
-        this.reader = reader;
-    }
-
-    private Terminal terminal() {
-        return reader.getTerminal();
     }
 
     public Set<String> commandNames() {
