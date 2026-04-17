@@ -1,6 +1,5 @@
 package ir.moke.dena.console;
 
-import org.jline.console.CommandRegistry;
 import org.jline.console.SystemRegistry;
 import org.jline.console.impl.SystemRegistryImpl;
 import org.jline.reader.*;
@@ -10,7 +9,7 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 
-public class CommandLine implements TtyAsciiCodecs {
+public class DenaCLI implements TtyAsciiCodecs {
     private static final String PS1 = "%s DENA %s%s\uE0B0 %s".formatted(BACKGROUND_BLUE, RESET, BLUE, RESET);
     private static final Parser parser = new DefaultParser();
     private static final DenaCommandRegistry denaCommandRegistry = new DenaCommandRegistry();
@@ -37,7 +36,7 @@ public class CommandLine implements TtyAsciiCodecs {
                     .option(LineReader.Option.INSERT_BRACKET, true)
                     .option(LineReader.Option.EMPTY_WORD_OPTIONS, false)
                     .build();
-            
+
             //
             // REPL-loop
             //
@@ -60,7 +59,11 @@ public class CommandLine implements TtyAsciiCodecs {
         }
     }
 
-    public static void applyCommandRegistry(CommandRegistry commandRegistry) {
-        system.setCommandRegistries(commandRegistry);
+    public static void addSystemRegistry(SystemRegistry registry) {
+        SystemRegistry.add(registry);
+    }
+
+    public static void removeCommandRegistry() {
+        SystemRegistry.remove();
     }
 }
