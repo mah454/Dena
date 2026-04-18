@@ -77,11 +77,11 @@ public class DenaCLI implements TtyAsciiCodecs {
         }
     }
 
-    public static void addCommandRegistry(String description, Runnable... runnableCommands) {
+    public static void addCommandRegistry(String description, Object... runnableCommands) {
         CommandLine rootCli = new CommandLine(new RootCommand());
         PicocliCommands commands = new PicocliCommands(rootCli);
         commands.name(description);
-        for (Runnable cmd : runnableCommands) {
+        for (Object cmd : runnableCommands) {
             String name = cmd.getClass().getDeclaredAnnotation(CommandLine.Command.class).name();
             CommandLine commandLine = new CommandLine(cmd);
             rootCli.addSubcommand(name, commandLine);
@@ -91,7 +91,7 @@ public class DenaCLI implements TtyAsciiCodecs {
         inLoop = !inLoop;
     }
 
-    public static void removeCommandRegistry(Runnable runnableCommand) {
+    public static void removeCommandRegistry(Object runnableCommand) {
         String name = runnableCommand.getClass().getDeclaredAnnotation(CommandLine.Command.class).name();
         CommandRegistry commandRegistry = registryList.stream().filter(item -> item.commandNames().contains(name)).findFirst().orElse(null);
         if (commandRegistry != null) {
