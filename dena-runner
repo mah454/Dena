@@ -11,5 +11,6 @@ cd ${SCRIPT_LOCATION}
 exec ${CMD} \
   -p lib/shared:framework \
   --add-modules ALL-MODULE-PATH \
+  --enable-native-access=org.jline \
   -cp .:lib/system/* \
   ir.moke.dena.MainClass
