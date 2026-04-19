@@ -70,7 +70,7 @@ public class DenaCLI implements TtyAsciiCodecs {
                     }
                 }
                 system.close();
-                inLoop = !inLoop;
+                inLoop = true;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -88,7 +88,7 @@ public class DenaCLI implements TtyAsciiCodecs {
         }
         registryList.add(commands);
         system.setCommandRegistries(registryList.toArray(CommandRegistry[]::new));
-        inLoop = !inLoop;
+        inLoop = false;
     }
 
     public static void removeCommandRegistry(Object runnableCommand) {
@@ -98,7 +98,7 @@ public class DenaCLI implements TtyAsciiCodecs {
             registryList.remove(commandRegistry);
             system.setCommandRegistries(registryList.toArray(CommandRegistry[]::new));
         }
-        inLoop = !inLoop;
+        inLoop = false;
     }
 
     @SuppressWarnings("unchecked")
