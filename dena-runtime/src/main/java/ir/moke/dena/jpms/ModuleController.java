@@ -39,6 +39,7 @@ public class ModuleController implements GlobalVariables {
         WatchEvent<Path> ev = (WatchEvent<Path>) event;
         Path moduleDirPath = ev.context();
         String moduleName = moduleDirPath.getFileName().toString();
+        logger.warn("Module {} removed from filesystem", moduleName);
         listOnUsedModules(moduleName).stream().map(ModuleContext::getName).forEach(ModuleController::stop);
         ModuleContext moduleContext = ModuleRepository.get(moduleName);
         unloadDependentModule(moduleContext);
@@ -215,7 +216,8 @@ public class ModuleController implements GlobalVariables {
 
     public static void stop(String moduleName) {
         ModuleContext context = ModuleRepository.get(moduleName);
-        if (context == null || !context.isLoaded()) throw new IllegalStateException("Module %s not loaded yet".formatted(moduleName));
+        if (context == null || !context.isLoaded())
+            throw new IllegalStateException("Module %s not loaded yet".formatted(moduleName));
         shutdown(context);
         FileUtils.storeProperty("start", "false", context.getPath());
     }
