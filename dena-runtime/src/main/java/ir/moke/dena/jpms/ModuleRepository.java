@@ -41,7 +41,7 @@ public class ModuleRepository implements GlobalVariables {
                 .map(item -> new ModuleContext(item.getFileName().toString(), item))
                 .toList());
 
-        list.removeAll(MODULES);
+        MODULES.forEach(list::remove);
         list.addAll(MODULES);
         return list;
     }
