@@ -9,7 +9,7 @@ cd ${SCRIPT_LOCATION}
 [[ -f conf/env ]] && . conf/env
 
 exec ${CMD} \
-  -p lib/shared:framework \
+  -p lib:framework \
   --add-modules ALL-MODULE-PATH \
   --enable-native-access=org.jline \
   -cp .:lib/system/* \
