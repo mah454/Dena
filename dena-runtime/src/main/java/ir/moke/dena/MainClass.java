@@ -17,6 +17,8 @@ public class MainClass implements TtyAsciiCodecs {
     private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
 
     static {
+        System.setProperty("dena.work-dir", workDir);
+
         try {
             LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
             context.reset();
@@ -29,7 +31,6 @@ public class MainClass implements TtyAsciiCodecs {
         }
 
         Logo.print();
-        System.setProperty("dena.work-dir", workDir);
         logger.info("Dena work directory: {}", workDir);
     }
 
