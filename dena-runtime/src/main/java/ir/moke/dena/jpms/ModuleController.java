@@ -99,7 +99,7 @@ public class ModuleController implements GlobalVariables {
             FileUtils.storeProperty("load", "true", modulePath);
             logger.info("[{}] - Module loaded", moduleName);
         } catch (Exception e) {
-            logger.warn("Failed unload module {}", moduleName, e);
+            logger.warn("Failed load module {}", moduleName, e);
         }
     }
 
