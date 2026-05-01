@@ -109,7 +109,6 @@ public class ModuleController implements GlobalVariables {
             unloadDependentModule(context);
             stop(moduleName);
             deactivateModule(context);
-            ModuleRepository.remove(moduleName);
             FileUtils.storeProperty("load", "false", context.getPath());
         } catch (Exception e) {
             logger.error("Failed to unload module {} , err: {}", moduleName, e.getMessage());
