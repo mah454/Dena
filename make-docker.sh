@@ -7,5 +7,5 @@ cp -aRvf build/dena docker/
 (
   cd docker
   ./generate-jre.sh
-  docker build . -t dena:latest
+  docker build . -t mah454/dena:latest
 )

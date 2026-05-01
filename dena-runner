@@ -4,7 +4,7 @@ export CMD="java"
 export SCRIPT_LOCATION=$(dirname $0)
 cd ${SCRIPT_LOCATION}
 
-[[ $1 == "-d" ]] && CMD="java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+[[ $1 == "-d" || $DEBUG_MODE == "true" ]] && CMD="java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 
 [[ -f conf/env ]] && . conf/env
 

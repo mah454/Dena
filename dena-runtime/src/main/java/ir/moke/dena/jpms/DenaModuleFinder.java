@@ -1,6 +1,8 @@
 package ir.moke.dena.jpms;
 
 import ir.moke.dena.utils.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.module.Configuration;
 import java.lang.module.ModuleDescriptor;
@@ -14,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DenaModuleFinder implements ModuleFinder {
+    private static final Logger logger = LoggerFactory.getLogger(DenaModuleFinder.class);
     private final Set<String> excludedModules;
     private final ModuleFinder delegateFinder;
     private final List<Configuration> parentConfigurations;
@@ -71,6 +74,10 @@ public class DenaModuleFinder implements ModuleFinder {
         this.allModulesCache = foundModules.stream()
                 .filter(ref -> !exclusions.contains(ref.descriptor().name()))
                 .collect(Collectors.toUnmodifiableSet());
+
+        if (!foundModules.isEmpty() && this.allModulesCache.isEmpty()) {
+            logger.error("Module already loaded on parent layer - founded modules: {}", foundModules.stream().map(item -> item.descriptor().name()).toList());
+        }
 
         this.excludedModules = Set.copyOf(exclusions);
     }
