@@ -106,6 +106,8 @@ public class ModuleController implements GlobalVariables {
     public static void unload(String moduleName) {
         try {
             ModuleContext context = ModuleRepository.get(moduleName);
+            // module already unloaded
+            if (context == null) return;
             unloadDependentModule(context);
             stop(moduleName);
             deactivateModule(context);
