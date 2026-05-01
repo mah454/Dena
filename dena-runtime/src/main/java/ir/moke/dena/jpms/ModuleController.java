@@ -113,7 +113,7 @@ public class ModuleController implements GlobalVariables {
         } catch (Exception e) {
             logger.error("Failed to unload module {} , err: {}", moduleName, e.getMessage());
         } finally {
-            triggerGC();
+            triggerGC(moduleName);
         }
     }
 
@@ -209,7 +209,7 @@ public class ModuleController implements GlobalVariables {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            triggerGC();
+            triggerGC(moduleName);
         }
     }
 
@@ -272,8 +272,8 @@ public class ModuleController implements GlobalVariables {
         return FileUtils.isFileExists(denaModulesDirectory.resolve(moduleName));
     }
 
-    private static void triggerGC() {
-        logger.info("Trigger GC");
+    private static void triggerGC(String moduleName) {
+        logger.info("[{}] - Trigger GC", moduleName);
         System.gc();
     }
 
