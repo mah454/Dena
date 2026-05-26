@@ -1,5 +1,7 @@
 FROM debian:latest 
 
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 ENV JAVA_HOME=/opt/jre
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
